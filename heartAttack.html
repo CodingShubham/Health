@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Attack Prediction Model</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* Adjust width of the form */
+            width: 100%; /* Make form responsive */
+        }
+
+        .heart-icon {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 80px;
+            background: red;
+            border-radius: 50px 50px 0 0;
+            transform: translate(-50%, -100%) rotate(-45deg);
+        }
+
+        .heart:before,
+        .heart:after {
+            content: '';
+            position: absolute;
+            background: red;
+            border-radius: 50%;
+        }
+
+        .heart:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 0;
+        }
+
+        .heart:after {
+            width: 50px;
+            height: 50px;
+            left: 25px;
+            top: 0;
+        }
+
+        .pulse {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.3);
+            top: 0;
+            left: 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%,
+            20%,
+            40%,
+            60%,
+            80%,
+            100% {
+                transform: scale(1);
+            }
+            10% {
+                transform: scale(1.1);
+            }
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%; /* Full width input fields */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px; /* Adjust font size for better fit */
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="heart-icon">
+            <div class="pulse"></div>
+            <div class="heart"></div>
+        </div>
+        <h1>Heart Attack Prediction Model</h1>
+        <form id="predictionForm">
+            <label for="age">Age:</label>
+            <input type="number" id="age" required>
+
+            <label for="sex">Sex:</label>
+            <select id="sex" required>
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+
+            <label for="cholesterol">Cholesterol Level (mg/dL):</label>
+            <input type="number" id="cholesterol" required>
+
+            <label for="bloodPressure">Blood Pressure (mm Hg):</label>
+            <input type="number" id="bloodPressure" required>
+
+            <label for="chestPain">Chest Pain Type:</label>
+            <select id="chestPain" required>
+                <option value="">Select</option>
+                <option value="1">Typical Angina</option>
+                <option value="2">Atypical Angina</option>
+                <option value="3">Non-Anginal Pain</option>
+                <option value="4">Asymptomatic</option>
+            </select>
+
+            <label for="restingECG">Resting ECG:</label>
+            <select id="restingECG" required>
+                <option value="">Select</option>
+                <option value="0">Normal</option>
+                <option value="1">ST-T Wave Abnormality</option>
+                <option value="2">Left Ventricular Hypertrophy</option>
+            </select>
+
+            <label for="slope">Slope of Peak Exercise ST:</label>
+            <select id="slope" required>
+                <option value="">Select</option>
+                <option value="1">Upsloping</option>
+                <option value="2">Flat</option>
+                <option value="3">Downsloping</option>
+            </select>
+
+            <label for="numMajorVessels">Number of Major Vessels:</label>
+            <input type="number" id="numMajorVessels" required>
+
+            <label for="smoking">Smoking Status:</label>
+            <select id="smoking" required>
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get input values
+            const age = parseInt(document.getElementById('age').value);
+            const sex = document.getElementById('sex').value;
+            const cholesterol = parseInt(document.getElementById('cholesterol').value);
+            const bloodPressure = parseInt(document.getElementById('bloodPressure').value);
+            const chestPain = parseInt(document.getElementById('chestPain').value);
+            const restingECG = parseInt(document.getElementById('restingECG').value);
+            const slope = parseInt(document.getElementById('slope').value);
+            const numMajorVessels = parseInt(document.getElementById('numMajorVessels').value);
+            const smoking = document.getElementById('smoking').value;
+
+            // Basic prediction logic (extend or replace with ML model)
+            let riskScore = 0;
+
+            // Simple rules for risk score
+            if (age > 45) riskScore += 1; // Age risk
+            if (cholesterol > 240) riskScore += 1; // Cholesterol risk
+            if (bloodPressure > 130) riskScore += 1; // Blood pressure risk
+            if (sex === "male") riskScore += 1; // Male risk
+            if (chestPain > 2) riskScore += 1; // Chest pain type 3 or 4 are higher risk
+            if (restingECG > 0) riskScore += 1; // Any ECG abnormality increases risk
+            if (slope === 3) riskScore += 1; // Downsloping ST is a risk factor
+            if (numMajorVessels > 0) riskScore += 1; // Major vessels affected is risky
+            if (smoking === "yes") riskScore += 1; // Smoking risk
+
+            // Display result
+            const resultDiv = document.getElementById('result');
+            if (riskScore >= 4) {
+                resultDiv.innerText = "High Risk of Heart Attack. Please consult a doctor.";
+                resultDiv.style.color = "red";
+            } else {
+                resultDiv.innerText = "Low Risk of Heart Attack. Maintain a healthy lifestyle.";
+                resultDiv.style.color = "green";
+            }
+        });
+    </script>
+</body>
+</html>
